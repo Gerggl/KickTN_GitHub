@@ -18,6 +18,7 @@ public class Spielergui extends JFrame {
     private TableRowSorter<DefaultTableModel> sorter;
     private JTextField filterField;
 
+    //Zu 
     // Konstruktor
     public Spielergui() {
         setTitle("Spielerliste");
