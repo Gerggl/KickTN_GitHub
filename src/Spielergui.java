@@ -3,6 +3,8 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.event.*;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
@@ -10,7 +12,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class Spielergui extends JFrame {
+public class SpielerGUI extends JFrame {
 
     // Attribute
     private JTable tabelle;
@@ -18,9 +20,8 @@ public class Spielergui extends JFrame {
     private TableRowSorter<DefaultTableModel> sorter;
     private JTextField filterField;
 
-    //Zu 
     // Konstruktor
-    public Spielergui() {
+    public SpielerGUI() {
         setTitle("Spielerliste");
         setSize(1100, 650);
         setLocationRelativeTo(null);
@@ -65,18 +66,14 @@ public class Spielergui extends JFrame {
         topPanel.add(textPanel, BorderLayout.WEST);
         topPanel.add(logoLabel, BorderLayout.EAST);
 
-        // Panel für Suche und Export-Button (zentriert)
-        // Neues Panel mit vertikalem Layout
         JPanel filterExportPanel = new JPanel();
         filterExportPanel.setLayout(new BoxLayout(filterExportPanel, BoxLayout.Y_AXIS));
         filterExportPanel.setBackground(hintergrundFarbe);
         filterExportPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 0, 0));
 
-        // Unterpanel für Suchzeile (horizontal)
         JPanel suchPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
         suchPanel.setBackground(hintergrundFarbe);
 
-        // Label fürs Suchfeld
         JLabel filterLabel = new JLabel("Spieler suchen:");
         filterLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         filterLabel.setForeground(Color.DARK_GRAY);
@@ -91,7 +88,6 @@ public class Spielergui extends JFrame {
         filterField.setPreferredSize(new Dimension(220, 32));
         suchPanel.add(filterField);
 
-        // Button separat mit Abstand nach oben
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(hintergrundFarbe);
 
@@ -105,13 +101,10 @@ public class Spielergui extends JFrame {
         exportButton.setUI(new RoundedButtonUI(buttonColor, buttonHoverColor));
         buttonPanel.add(exportButton);
 
-        // Panels zusammenbauen
         filterExportPanel.add(suchPanel);
         filterExportPanel.add(buttonPanel);
 
-        // Abgerundete Ecken für Button
         exportButton.setUI(new RoundedButtonUI(buttonColor, buttonHoverColor));
-        // Abstand nach oben zum Button
         filterExportPanel.add(Box.createRigidArea(new Dimension(0, 20)));
         filterExportPanel.add(exportButton);
 
@@ -119,7 +112,7 @@ public class Spielergui extends JFrame {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // Tabellenmodell
+        // Tabelle
         tabelleModel = new DefaultTableModel() {
             @Override
             public Class<?> getColumnClass(int column) {
@@ -203,7 +196,7 @@ public class Spielergui extends JFrame {
             }
         });
 
-        // Zellrenderer
+        //Styling
         DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             private final Color evenColor = new Color(200, 225, 230);
             private final Color oddColor = new Color(240, 250, 255);
@@ -228,7 +221,7 @@ public class Spielergui extends JFrame {
         tabelle.setDefaultRenderer(Object.class, cellRenderer);
         tabelle.setDefaultRenderer(Integer.class, cellRenderer);
 
-        // Renderer für LocalDate (Geburtsdatum)
+        // Geburtsdatum "schöner" angeben
         tabelle.setDefaultRenderer(LocalDate.class, new DefaultTableCellRenderer() {
             private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.GERMAN);
 
@@ -243,7 +236,6 @@ public class Spielergui extends JFrame {
             }
         });
 
-        // Renderer für Bilder
         tabelle.setDefaultRenderer(ImageIcon.class, new DefaultTableCellRenderer() {
             private final Color evenColor = new Color(200, 225, 230);
             private final Color oddColor = new Color(240, 250, 255);
@@ -276,7 +268,6 @@ public class Spielergui extends JFrame {
 
         spielerLaden();
 
-        // Listener für Filterfeld
         filterField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             public void changedUpdate(javax.swing.event.DocumentEvent e) {
                 filter();
@@ -310,13 +301,11 @@ public class Spielergui extends JFrame {
 
         });
 
-        // Listener für Export-Button
         exportButton.addActionListener(e -> exportiereAlsCSV());
 
         setVisible(true);
     }
 
-    // Custom UI für abgerundeten Button mit Hover-Effekt
     static class RoundedButtonUI extends javax.swing.plaf.basic.BasicButtonUI {
         private final Color normalColor;
         private final Color hoverColor;
@@ -353,11 +342,9 @@ public class Spielergui extends JFrame {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            // Hintergrund
             g2.setColor(hover ? hoverColor : normalColor);
             g2.fillRoundRect(0, 0, c.getWidth(), c.getHeight(), 30, 30);
 
-            // Text
             FontMetrics fm = g2.getFontMetrics();
             Rectangle r = new Rectangle(0, 0, c.getWidth(), c.getHeight());
             String text = b.getText();
@@ -389,7 +376,7 @@ public class Spielergui extends JFrame {
 
             while (rs.next()) {
                 String fotoName = rs.getString("Foto");
-                ImageIcon scaledIcon = getScaledImageIcon("./KickTN/bilder/" + fotoName, 128, 160);
+                ImageIcon scaledIcon = getScaledImageIcon("bilder/" + fotoName, 128, 160);
 
                 boolean aktiv = rs.getBoolean("Aktiv");
 
@@ -431,36 +418,43 @@ public class Spielergui extends JFrame {
     private void exportiereAlsCSV() {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("CSV-Datei speichern");
+
+        // Vordefinierten Dateinamen setzen
+        String defaultFileName = "Spieler.csv";
+        chooser.setSelectedFile(new File(defaultFileName));
+
         int userSelection = chooser.showSaveDialog(this);
         if (userSelection == JFileChooser.APPROVE_OPTION) {
-            try (FileWriter fw = new FileWriter(chooser.getSelectedFile())) {
+            File selectedFile = chooser.getSelectedFile();
+
+            if (!selectedFile.getName().toLowerCase().endsWith(".csv")) {
+                selectedFile = new File(selectedFile.getAbsolutePath() + ".csv");
+            }
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(selectedFile))) {
                 for (int i = 0; i < tabelleModel.getColumnCount(); i++) {
-                    fw.append(tabelleModel.getColumnName(i));
+                    bw.append(tabelleModel.getColumnName(i));
                     if (i < tabelleModel.getColumnCount() - 1)
-                        fw.append(",");
+                        bw.append(",");
                 }
-                fw.append("\n");
+                bw.append("\n");
                 for (int row = 0; row < tabelleModel.getRowCount(); row++) {
                     for (int col = 0; col < tabelleModel.getColumnCount(); col++) {
                         Object value = tabelleModel.getValueAt(row, col);
                         if (value instanceof ImageIcon) {
-                            fw.append(""); // Bilder nicht exportieren
+                            bw.append("");
                         } else {
-                            fw.append(value.toString().replaceAll(",", " "));
+                            bw.append(value.toString().replace(",", " "));
                         }
                         if (col < tabelleModel.getColumnCount() - 1)
-                            fw.append(",");
+                            bw.append(",");
                     }
-                    fw.append("\n");
+                    bw.append("\n");
                 }
                 JOptionPane.showMessageDialog(this, "Erfolgreich exportiert!");
             } catch (IOException e) {
                 JOptionPane.showMessageDialog(this, "Fehler beim Exportieren:\n" + e.getMessage());
             }
         }
-    }
-
-    public static void main(String[] args) {
-        new Spielergui();
     }
 }

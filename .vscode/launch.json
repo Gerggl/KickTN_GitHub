@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "FussballStartGUI",
+            "request": "launch",
+            "mainClass": "FussballStartGUI",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
+            "name": "StartGUI",
+            "request": "launch",
+            "mainClass": "StartGUI",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
             "name": "Login",
             "request": "launch",
             "mainClass": "Login",
