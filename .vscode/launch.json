@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "StartFenster",
+            "request": "launch",
+            "mainClass": "StartFenster",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
             "name": "FussballStartGUI",
             "request": "launch",
             "mainClass": "FussballStartGUI",
