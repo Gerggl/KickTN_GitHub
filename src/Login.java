@@ -190,7 +190,7 @@ public class Login extends JFrame {
     }
 
     public static void main(String[] args) {
-        //SwingUtilities.invokeLater(Login::new);
-        new SpielerGUI();
+        SwingUtilities.invokeLater(Login::new);
+        //new SpielerGUI();
     }
 }

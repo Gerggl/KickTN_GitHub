@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Startfenster",
+            "request": "launch",
+            "mainClass": "Startfenster",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
+            "name": "RevolutionaeresStartfenster",
+            "request": "launch",
+            "mainClass": "RevolutionaeresStartfenster",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
+            "name": "Registrierungsformular",
+            "request": "launch",
+            "mainClass": "Registrierungsformular",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
             "name": "StartFenster",
             "request": "launch",
             "mainClass": "StartFenster",
