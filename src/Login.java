@@ -15,7 +15,7 @@ public class Login extends JFrame {
 
     public Login() {
         this.setTitle("KickTN Login");
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.getContentPane().setBackground(new Color(245, 250, 255));
 
         initComponents();
@@ -229,9 +229,5 @@ public class Login extends JFrame {
         protected void paintBorder(Graphics g) {
             // kein Rand
         }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(Login::new);
     }
 }

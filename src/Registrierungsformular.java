@@ -267,8 +267,4 @@ public class Registrierungsformular extends JFrame {
             // Kein sichtbarer Rand
         }
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(Registrierungsformular::new);
-    }
 }

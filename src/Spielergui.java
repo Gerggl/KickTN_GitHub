@@ -25,7 +25,7 @@ public class SpielerGUI extends JFrame {
         setTitle("Spielerliste");
         setSize(1100, 650);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         // Farben
         Color hintergrundFarbe = new Color(0xF7F6F4);
