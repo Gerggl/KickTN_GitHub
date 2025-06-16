@@ -8,8 +8,10 @@ public class Login extends JFrame {
     JPasswordField txt_passwort;
     RoundedButton btn_login, btn_zuruecksetzen, btn_beenden;
 
-    private final Color buttonColor = new Color(15, 105, 140);     // #0F698C
-    private final Color hoverColor = new Color(10, 85, 115);       // dunklere Variante
+    private final Color buttonColor = new Color(15, 105, 140); // #0F698C
+    private final Color hoverColor = new Color(10, 85, 115); // dunklere Variante
+    private final Color redColor = new Color(200, 50, 50); // Rot für "Beenden"
+    private final Color redHoverColor = new Color(160, 40, 40); // Dunkleres Rot
 
     public Login() {
         this.setTitle("KickTN Login");
@@ -73,20 +75,30 @@ public class Login extends JFrame {
         // Buttons
         btn_login = new RoundedButton("Login", buttonColor, hoverColor);
         btn_zuruecksetzen = new RoundedButton("Zurücksetzen", buttonColor, hoverColor);
-        btn_beenden = new RoundedButton("Beenden", buttonColor, hoverColor);
+        btn_beenden = new RoundedButton("Beenden", redColor, redHoverColor);
 
-        gbc.insets = new Insets(15, 10, 5, 10);
+        // Login Button
         gbc.gridx = 0;
         gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(15, 10, 5, 5);
         this.add(btn_login, gbc);
 
+        // Zurücksetzen Button
         gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(15, 5, 5, 10);
         this.add(btn_zuruecksetzen, gbc);
 
+        // Beenden Button
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
         gbc.insets = new Insets(20, 10, 20, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(btn_beenden, gbc);
 
         // Listener
@@ -94,6 +106,38 @@ public class Login extends JFrame {
         btn_login.addActionListener(listener);
         btn_zuruecksetzen.addActionListener(listener);
         btn_beenden.addActionListener(listener);
+
+        // Hinweis: Noch nicht registriert? Hier registrieren
+        JPanel registrierenPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        registrierenPanel.setBackground(new Color(245, 250, 255));
+
+        JLabel lblNochNichtRegistriert = new JLabel("Noch nicht registriert?");
+        lblNochNichtRegistriert.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+        JButton btnRegistrieren = new JButton("Hier registrieren");
+        btnRegistrieren.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnRegistrieren.setForeground(buttonColor);
+        btnRegistrieren.setBorderPainted(false);
+        btnRegistrieren.setContentAreaFilled(false);
+        btnRegistrieren.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegistrieren.setFocusPainted(false);
+
+        btnRegistrieren.addActionListener(e -> {
+            dispose();
+            new Registrierungsformular();
+        });
+
+        registrierenPanel.add(lblNochNichtRegistriert);
+        registrierenPanel.add(btnRegistrieren);
+
+        // Panel hinzufügen
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(10, 10, 20, 10);
+        gbc.anchor = GridBagConstraints.CENTER;
+        this.add(registrierenPanel, gbc);
+
     }
 
     private class MyActionListener implements ActionListener {
@@ -104,11 +148,9 @@ public class Login extends JFrame {
                 char[] passwortChars = txt_passwort.getPassword();
                 String passwort = new String(passwortChars);
 
-                // Passwort-Array direkt löschen (Sicherheit)
                 java.util.Arrays.fill(passwortChars, '0');
 
-                // Login im Hintergrund prüfen
-                btn_login.setEnabled(false);  // Button deaktivieren während Prüfung
+                btn_login.setEnabled(false);
                 new SwingWorker<Boolean, Void>() {
                     @Override
                     protected Boolean doInBackground() {
@@ -117,7 +159,7 @@ public class Login extends JFrame {
 
                     @Override
                     protected void done() {
-                        btn_login.setEnabled(true);  // Button wieder aktivieren
+                        btn_login.setEnabled(true);
                         try {
                             boolean loginErfolgreich = get();
                             if (loginErfolgreich) {
@@ -141,7 +183,7 @@ public class Login extends JFrame {
         }
     }
 
-    // Echte runde Buttons
+    // Runde Buttons
     class RoundedButton extends JButton {
         private Color normalColor;
         private Color hoverColor;
@@ -156,7 +198,7 @@ public class Login extends JFrame {
             setBorderPainted(false);
             setForeground(Color.WHITE);
             setFont(new Font("Segoe UI", Font.BOLD, 14));
-            setPreferredSize(new Dimension(150, 40));
+            setPreferredSize(new Dimension(0, 45)); // Höhe festlegen
 
             addMouseListener(new MouseAdapter() {
                 @Override
@@ -191,6 +233,5 @@ public class Login extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Login::new);
-        //new SpielerGUI();
     }
 }

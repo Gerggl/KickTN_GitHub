@@ -64,19 +64,19 @@ public class Startfenster extends JFrame {
                 "Login",
                 "Logge dich mit deinem Account ein und betrete die Spielerwelt.",
                 img1,
-                () -> zeigeLogin()
+                () -> new Login()
         ));
         cardPanel.add(createCard(
                 "Registrieren",
                 "Erstelle ein neues Konto und werde Teil der Community.",
                 img2,
-                () -> zeigeRegistrieren()
+                () -> new Registrierungsformular()
         ));
         cardPanel.add(createCard(
                 "Spielerliste",
                 "Sieh dir alle registrierten Spieler und ihre Daten an.",
                 img3,
-                () -> zeigeSpieler()
+                () -> new SpielerGUI()
         ));
 
         mainPanel.add(cardPanel, BorderLayout.CENTER);
@@ -140,18 +140,6 @@ public class Startfenster extends JFrame {
         if (img == null) return new JLabel("Kein Bild verfügbar");
         Image scaled = img.getScaledInstance(240, 160, Image.SCALE_SMOOTH);
         return new JLabel(new ImageIcon(scaled));
-    }
-
-    private void zeigeLogin() {
-        JOptionPane.showMessageDialog(this, "🚪 Login-Fenster geöffnet");
-    }
-
-    private void zeigeRegistrieren() {
-        JOptionPane.showMessageDialog(this, "📝 Registrierungs-Fenster geöffnet");
-    }
-
-    private void zeigeSpieler() {
-        JOptionPane.showMessageDialog(this, "📋 Spielerliste angezeigt");
     }
 
     public static void main(String[] args) {
