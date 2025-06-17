@@ -101,6 +101,23 @@ public class SpielerGUI extends JFrame {
         exportButton.setUI(new RoundedButtonUI(buttonColor, buttonHoverColor));
         buttonPanel.add(exportButton);
 
+        // Button "Spieler hinzufügen" erstellen
+        JButton addButton = new JButton("Spieler hinzufügen");
+        addButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        addButton.setBackground(buttonColor);
+        addButton.setForeground(Color.WHITE);
+        addButton.setFocusPainted(false);
+        addButton.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        addButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        addButton.setUI(new RoundedButtonUI(buttonColor, buttonHoverColor));
+
+        // Button zum Panel hinzufügen
+        buttonPanel.add(addButton);
+
+
+        addButton.addActionListener(e -> spielerHinzufuegen());
+
+
         filterExportPanel.add(suchPanel);
         filterExportPanel.add(buttonPanel);
 
@@ -111,6 +128,8 @@ public class SpielerGUI extends JFrame {
         topPanel.add(filterExportPanel, BorderLayout.CENTER);
 
         add(topPanel, BorderLayout.NORTH);
+
+        
 
         // Tabelle
         tabelleModel = new DefaultTableModel() {
@@ -457,4 +476,69 @@ public class SpielerGUI extends JFrame {
             }
         }
     }
+    private void spielerHinzufuegen() {
+    // Einfache Eingabemaske mit JTextFields in einem JOptionPane-Dialog
+    JTextField vornameField = new JTextField();
+    JTextField nachnameField = new JTextField();
+    JTextField positionField = new JTextField();
+    JTextField geburtsdatumField = new JTextField("TT.MM.JJJJ");
+    JTextField aktivField = new JTextField("Aktiv/Nicht aktiv");
+    JTextField vereinField = new JTextField();
+    JTextField fotoField = new JTextField("Dateiname.jpg");
+
+    JPanel panel = new JPanel(new GridLayout(0, 1));
+    panel.add(new JLabel("Vorname:"));
+    panel.add(vornameField);
+    panel.add(new JLabel("Nachname:"));
+    panel.add(nachnameField);
+    panel.add(new JLabel("Position:"));
+    panel.add(positionField);
+    panel.add(new JLabel("Geburtsdatum (TT.MM.JJJJ):"));
+    panel.add(geburtsdatumField);
+    panel.add(new JLabel("Aktiv (Aktiv/Nicht aktiv):"));
+    panel.add(aktivField);
+    panel.add(new JLabel("Verein:"));
+    panel.add(vereinField);
+    panel.add(new JLabel("Foto-Dateiname (z.B. bild.jpg):"));
+    panel.add(fotoField);
+
+    int result = JOptionPane.showConfirmDialog(this, panel, "Neuen Spieler hinzufügen",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+    if (result == JOptionPane.OK_OPTION) {
+        try {
+            String vorname = vornameField.getText().trim();
+            String nachname = nachnameField.getText().trim();
+            String position = positionField.getText().trim();
+            String gebDatumStr = geburtsdatumField.getText().trim();
+            String aktivStr = aktivField.getText().trim();
+            String verein = vereinField.getText().trim();
+            String fotoName = fotoField.getText().trim();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.M.yyyy");
+            LocalDate geburtsdatum = LocalDate.parse(gebDatumStr, formatter);
+
+            ImageIcon fotoIcon = getScaledImageIcon("bilder/" + fotoName, 128, 160);
+            String aktivStatus = aktivStr.equalsIgnoreCase("aktiv") ? "Aktiv" : "Nicht aktiv";
+
+            // Neue ID generieren (einfach max ID + 1 aus Tabelle)
+            int maxId = 0;
+            for (int i = 0; i < tabelleModel.getRowCount(); i++) {
+                int id = (int) tabelleModel.getValueAt(i, 0);
+                if (id > maxId) maxId = id;
+            }
+            int neueId = maxId + 1;
+
+            Object[] neueZeile = {
+                    neueId, vorname, nachname, position, geburtsdatum, fotoIcon, aktivStatus, verein
+            };
+
+            tabelleModel.addRow(neueZeile);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Fehler bei der Eingabe: " + ex.getMessage(),
+                    "Fehler", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
 }

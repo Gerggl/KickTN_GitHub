@@ -334,6 +334,6 @@ public class Startfenster extends JFrame {
         }
     }
     public static void main(String[] args) {
-        new Startfenster();
+        new Startfenster().setVisible(true);
     }
 }

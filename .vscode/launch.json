@@ -6,10 +6,31 @@
     "configurations": [
         {
             "type": "java",
+            "name": "LoginNEU",
+            "request": "launch",
+            "mainClass": "LoginNEU",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
+            "name": "Registrierungsformular",
+            "request": "launch",
+            "mainClass": "Registrierungsformular",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
+            "name": "Login",
+            "request": "launch",
+            "mainClass": "Login",
+            "projectName": "KickTN_GitHub_1e399318"
+        },
+        {
+            "type": "java",
             "name": "Startfenster",
             "request": "launch",
             "mainClass": "Startfenster",
-            "classPaths": [
+            "classPath": [
                 "bin",
                 "lib/mysql-connector-j-9.3.0.jar"
             ]

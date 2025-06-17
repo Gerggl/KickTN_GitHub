@@ -1,118 +1,200 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.SwingWorker;
 
 public class Login extends JFrame {
     JLabel lbl_ueberschrift, lbl_benutzer, lbl_passwort;
     JTextField txt_benutzer;
     JPasswordField txt_passwort;
     RoundedButton btn_login, btn_zuruecksetzen, btn_beenden;
+    RoundedButton toggleModeButton;
 
-    private final Color buttonColor = new Color(15, 105, 140); // #0F698C
-    private final Color hoverColor = new Color(10, 85, 115); // dunklere Variante
-    private final Color redColor = new Color(200, 50, 50); // Rot für "Beenden"
-    private final Color redHoverColor = new Color(160, 40, 40); // Dunkleres Rot
+    private Color buttonColor;
+    private Color hoverColor;
+    private Color redColor;
+    private Color redHoverColor;
+    private Color bgColor;
+    private Color textColor;
+
+    private boolean darkMode = false;
 
     public Login() {
+        initColors();
+
+        try {
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+
+        UIManager.put("control", bgColor);
+        UIManager.put("info", bgColor);
+        UIManager.put("nimbusBase", bgColor);
+        UIManager.put("nimbusLightBackground", bgColor);
+        UIManager.put("text", textColor);
+
         this.setTitle("KickTN Login");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.getContentPane().setBackground(new Color(245, 250, 255));
+        this.getContentPane().setBackground(bgColor);
 
         initComponents();
 
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+        this.setMinimumSize(new Dimension(450, 620));
+    }
+
+    private void initColors() {
+        if (darkMode) {
+            bgColor = new Color(40, 44, 52);
+            textColor = new Color(230, 230, 230);
+            buttonColor = new Color(45, 156, 219);
+            hoverColor = new Color(35, 130, 180);
+            redColor = new Color(200, 60, 60);
+            redHoverColor = new Color(160, 40, 40);
+        } else {
+            bgColor = new Color(245, 250, 255);
+            textColor = Color.BLACK;
+            buttonColor = new Color(15, 105, 140);
+            hoverColor = new Color(10, 85, 115);
+            redColor = new Color(200, 50, 50);
+            redHoverColor = new Color(160, 40, 40);
+        }
+    }
+
+    private void styleTextField(JTextField field) {
+        RoundedLineBorder rounded15Border = new RoundedLineBorder(buttonColor, 1, 15);
+        RoundedLineBorder focus15Border = new RoundedLineBorder(hoverColor, 1, 15);
+        Border padding = BorderFactory.createEmptyBorder(8, 12, 8, 12);
+
+        field.setBorder(BorderFactory.createCompoundBorder(
+                rounded15Border,
+                padding));
+        field.setBackground(bgColor);
+        field.setForeground(textColor);
+        field.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        field.setCaretColor(textColor);
+
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                field.setBorder(BorderFactory.createCompoundBorder(
+                        focus15Border,
+                        padding));
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                field.setBorder(BorderFactory.createCompoundBorder(
+                        rounded15Border,
+                        padding));
+            }
+        });
     }
 
     private void initComponents() {
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        Font labelFont = new Font("Segoe UI", Font.PLAIN, 16);
-        Font titleFont = new Font("Segoe UI", Font.BOLD, 34);
+        toggleModeButton = new RoundedButton(darkMode ? "Light Mode" : "Dark Mode", buttonColor, hoverColor);
+        toggleModeButton.setPreferredSize(new Dimension(120, 40));
+        toggleModeButton.addActionListener(e -> toggleTheme());
 
-        // Überschrift
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(bgColor);
+        headerPanel.add(toggleModeButton, BorderLayout.EAST);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTH;
+        gbc.insets = new Insets(10, 10, 0, 10);
+        this.add(headerPanel, gbc);
+
+        Font labelFont = new Font("Segoe UI", Font.PLAIN, 16);
+        Font titleFont = new Font("Segoe UI", Font.BOLD, 32);
+
         lbl_ueberschrift = new JLabel("Willkommen bei KickTN");
         lbl_ueberschrift.setFont(titleFont);
         lbl_ueberschrift.setForeground(buttonColor);
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(25, 10, 20, 10);
+        gbc.insets = new Insets(15, 10, 30, 10);
         gbc.anchor = GridBagConstraints.CENTER;
         this.add(lbl_ueberschrift, gbc);
 
-        // Benutzername
         lbl_benutzer = new JLabel("Benutzername:");
         lbl_benutzer.setFont(labelFont);
+        lbl_benutzer.setForeground(textColor);
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(10, 10, 5, 10);
         this.add(lbl_benutzer, gbc);
 
         txt_benutzer = new JTextField(16);
-        txt_benutzer.setFont(labelFont);
+        styleTextField(txt_benutzer);
         gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(txt_benutzer, gbc);
 
-        // Passwort
         lbl_passwort = new JLabel("Passwort:");
         lbl_passwort.setFont(labelFont);
+        lbl_passwort.setForeground(textColor);
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.NONE;
         this.add(lbl_passwort, gbc);
 
         txt_passwort = new JPasswordField(16);
-        txt_passwort.setFont(labelFont);
+        styleTextField(txt_passwort);
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(txt_passwort, gbc);
 
-        // Buttons
         btn_login = new RoundedButton("Login", buttonColor, hoverColor);
         btn_zuruecksetzen = new RoundedButton("Zurücksetzen", buttonColor, hoverColor);
         btn_beenden = new RoundedButton("Beenden", redColor, redHoverColor);
 
-        // Login Button
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         gbc.gridwidth = 1;
         gbc.weightx = 0.5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(15, 10, 5, 5);
+        gbc.insets = new Insets(5, 10, 5, 10);
         this.add(btn_login, gbc);
 
-        // Zurücksetzen Button
         gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.insets = new Insets(15, 5, 5, 10);
+        gbc.gridy = 4;
         this.add(btn_zuruecksetzen, gbc);
 
-        // Beenden Button
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy = 5;
         gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(20, 10, 20, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(btn_beenden, gbc);
 
-        // Listener
-        MyActionListener listener = new MyActionListener();
-        btn_login.addActionListener(listener);
-        btn_zuruecksetzen.addActionListener(listener);
-        btn_beenden.addActionListener(listener);
+        btn_login.addActionListener(new MyActionListener());
+        btn_zuruecksetzen.addActionListener(new MyActionListener());
+        btn_beenden.addActionListener(new MyActionListener());
 
-        // Hinweis: Noch nicht registriert? Hier registrieren
         JPanel registrierenPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
-        registrierenPanel.setBackground(new Color(245, 250, 255));
+        registrierenPanel.setBackground(bgColor);
 
         JLabel lblNochNichtRegistriert = new JLabel("Noch nicht registriert?");
         lblNochNichtRegistriert.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblNochNichtRegistriert.setForeground(textColor);
 
         JButton btnRegistrieren = new JButton("Hier registrieren");
         btnRegistrieren.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -130,25 +212,62 @@ public class Login extends JFrame {
         registrierenPanel.add(lblNochNichtRegistriert);
         registrierenPanel.add(btnRegistrieren);
 
-        // Panel hinzufügen
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(10, 10, 20, 10);
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(20, 10, 20, 10);
         this.add(registrierenPanel, gbc);
 
+        this.getRootPane().setDefaultButton(btn_login);
+    }
+
+    private void toggleTheme() {
+        darkMode = !darkMode;
+        initColors();
+        this.getContentPane().setBackground(bgColor);
+
+        lbl_ueberschrift.setForeground(buttonColor);
+        lbl_benutzer.setForeground(textColor);
+        lbl_passwort.setForeground(textColor);
+
+        btn_login.updateColors(buttonColor, hoverColor);
+        btn_zuruecksetzen.updateColors(buttonColor, hoverColor);
+        btn_beenden.updateColors(redColor, redHoverColor);
+
+        toggleModeButton.setText(darkMode ? "Light Mode" : "Dark Mode");
+        toggleModeButton.updateColors(buttonColor, hoverColor);
+
+        for (Component comp : this.getContentPane().getComponents()) {
+            if (comp instanceof JPanel panel) {
+                panel.setBackground(bgColor);
+                for (Component c : panel.getComponents()) {
+                    if (c instanceof JLabel lbl) lbl.setForeground(textColor);
+                    if (c instanceof JButton btn && btn != toggleModeButton) btn.setForeground(buttonColor);
+                }
+            }
+        }
+
+        styleTextField(txt_benutzer);
+        styleTextField(txt_passwort);
+        this.repaint();
     }
 
     private class MyActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == btn_login) {
-                String benutzer = txt_benutzer.getText();
+                String benutzer = txt_benutzer.getText().trim();
                 char[] passwortChars = txt_passwort.getPassword();
                 String passwort = new String(passwortChars);
-
                 java.util.Arrays.fill(passwortChars, '0');
+
+                // Optional Hashing (aktivieren wenn in DB gehasht gespeichert)
+                // passwort = hashPassword(passwort);
+
+                if (benutzer.isEmpty() || passwort.isEmpty()) {
+                    JOptionPane.showMessageDialog(Login.this, "Bitte Benutzername und Passwort eingeben.", "Fehler", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 btn_login.setEnabled(false);
                 new SwingWorker<Boolean, Void>() {
@@ -165,7 +284,7 @@ public class Login extends JFrame {
                             if (loginErfolgreich) {
                                 JOptionPane.showMessageDialog(Login.this, "Login erfolgreich!");
                             } else {
-                                JOptionPane.showMessageDialog(Login.this, "Login fehlgeschlagen!");
+                                JOptionPane.showMessageDialog(Login.this, "Benutzername oder Passwort falsch.");
                             }
                         } catch (Exception ex) {
                             ex.printStackTrace();
@@ -183,7 +302,6 @@ public class Login extends JFrame {
         }
     }
 
-    // Runde Buttons
     class RoundedButton extends JButton {
         private Color normalColor;
         private Color hoverColor;
@@ -198,7 +316,7 @@ public class Login extends JFrame {
             setBorderPainted(false);
             setForeground(Color.WHITE);
             setFont(new Font("Segoe UI", Font.BOLD, 14));
-            setPreferredSize(new Dimension(0, 45)); // Höhe festlegen
+            setPreferredSize(new Dimension(0, 50));
 
             addMouseListener(new MouseAdapter() {
                 @Override
@@ -215,6 +333,12 @@ public class Login extends JFrame {
             });
         }
 
+        public void updateColors(Color normal, Color hover) {
+            this.normalColor = normal;
+            this.hoverColor = hover;
+            repaint();
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
@@ -226,8 +350,40 @@ public class Login extends JFrame {
         }
 
         @Override
-        protected void paintBorder(Graphics g) {
-            // kein Rand
+        protected void paintBorder(Graphics g) {}
+    }
+
+    static class RoundedLineBorder extends AbstractBorder {
+        private final Color color;
+        private final int thickness;
+        private final int radius;
+
+        public RoundedLineBorder(Color color, int thickness, int radius) {
+            this.color = color;
+            this.thickness = thickness;
+            this.radius = radius;
+        }
+
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(color);
+            for (int i = 0; i < thickness; i++) {
+                g2.drawRoundRect(x + i, y + i, width - 1 - 2 * i, height - 1 - 2 * i, radius, radius);
+            }
+            g2.dispose();
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return new Insets(thickness, thickness, thickness, thickness);
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c, Insets insets) {
+            insets.left = insets.top = insets.right = insets.bottom = thickness;
+            return insets;
         }
     }
 }
