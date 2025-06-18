@@ -364,6 +364,7 @@ public class Registrierungsformular extends JFrame {
 
         // ActionListener für den "Bereits registriert"-Button
         btn_bereitsRegistriert.addActionListener(e -> {
+            dispose();
             new Login();
         });
 

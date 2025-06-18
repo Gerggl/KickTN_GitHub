@@ -114,9 +114,7 @@ public class SpielerGUI extends JFrame {
         // Button zum Panel hinzufügen
         buttonPanel.add(addButton);
 
-
         addButton.addActionListener(e -> spielerHinzufuegen());
-
 
         filterExportPanel.add(suchPanel);
         filterExportPanel.add(buttonPanel);
@@ -128,8 +126,6 @@ public class SpielerGUI extends JFrame {
         topPanel.add(filterExportPanel, BorderLayout.CENTER);
 
         add(topPanel, BorderLayout.NORTH);
-
-        
 
         // Tabelle
         tabelleModel = new DefaultTableModel() {
@@ -215,7 +211,7 @@ public class SpielerGUI extends JFrame {
             }
         });
 
-        //Styling
+        // Styling
         DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             private final Color evenColor = new Color(200, 225, 230);
             private final Color oddColor = new Color(240, 250, 255);
@@ -240,7 +236,6 @@ public class SpielerGUI extends JFrame {
         tabelle.setDefaultRenderer(Object.class, cellRenderer);
         tabelle.setDefaultRenderer(Integer.class, cellRenderer);
 
-        // Geburtsdatum "schöner" angeben
         tabelle.setDefaultRenderer(LocalDate.class, new DefaultTableCellRenderer() {
             private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.GERMAN);
 
@@ -438,7 +433,6 @@ public class SpielerGUI extends JFrame {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("CSV-Datei speichern");
 
-        // Vordefinierten Dateinamen setzen
         String defaultFileName = "Spieler.csv";
         chooser.setSelectedFile(new File(defaultFileName));
 
@@ -476,69 +470,68 @@ public class SpielerGUI extends JFrame {
             }
         }
     }
+
     private void spielerHinzufuegen() {
-    // Einfache Eingabemaske mit JTextFields in einem JOptionPane-Dialog
-    JTextField vornameField = new JTextField();
-    JTextField nachnameField = new JTextField();
-    JTextField positionField = new JTextField();
-    JTextField geburtsdatumField = new JTextField("TT.MM.JJJJ");
-    JTextField aktivField = new JTextField("Aktiv/Nicht aktiv");
-    JTextField vereinField = new JTextField();
-    JTextField fotoField = new JTextField("Dateiname.jpg");
+        JTextField vornameField = new JTextField();
+        JTextField nachnameField = new JTextField();
+        JTextField positionField = new JTextField();
+        JTextField geburtsdatumField = new JTextField("TT.MM.JJJJ");
+        JTextField aktivField = new JTextField("Aktiv/Nicht aktiv");
+        JTextField vereinField = new JTextField();
+        JTextField fotoField = new JTextField("Dateiname.jpg");
 
-    JPanel panel = new JPanel(new GridLayout(0, 1));
-    panel.add(new JLabel("Vorname:"));
-    panel.add(vornameField);
-    panel.add(new JLabel("Nachname:"));
-    panel.add(nachnameField);
-    panel.add(new JLabel("Position:"));
-    panel.add(positionField);
-    panel.add(new JLabel("Geburtsdatum (TT.MM.JJJJ):"));
-    panel.add(geburtsdatumField);
-    panel.add(new JLabel("Aktiv (Aktiv/Nicht aktiv):"));
-    panel.add(aktivField);
-    panel.add(new JLabel("Verein:"));
-    panel.add(vereinField);
-    panel.add(new JLabel("Foto-Dateiname (z.B. bild.jpg):"));
-    panel.add(fotoField);
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Vorname:"));
+        panel.add(vornameField);
+        panel.add(new JLabel("Nachname:"));
+        panel.add(nachnameField);
+        panel.add(new JLabel("Position:"));
+        panel.add(positionField);
+        panel.add(new JLabel("Geburtsdatum (TT.MM.JJJJ):"));
+        panel.add(geburtsdatumField);
+        panel.add(new JLabel("Aktiv (Aktiv/Nicht aktiv):"));
+        panel.add(aktivField);
+        panel.add(new JLabel("Verein:"));
+        panel.add(vereinField);
+        panel.add(new JLabel("Foto-Dateiname (z.B. bild.jpg):"));
+        panel.add(fotoField);
 
-    int result = JOptionPane.showConfirmDialog(this, panel, "Neuen Spieler hinzufügen",
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, panel, "Neuen Spieler hinzufügen",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-    if (result == JOptionPane.OK_OPTION) {
-        try {
-            String vorname = vornameField.getText().trim();
-            String nachname = nachnameField.getText().trim();
-            String position = positionField.getText().trim();
-            String gebDatumStr = geburtsdatumField.getText().trim();
-            String aktivStr = aktivField.getText().trim();
-            String verein = vereinField.getText().trim();
-            String fotoName = fotoField.getText().trim();
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String vorname = vornameField.getText().trim();
+                String nachname = nachnameField.getText().trim();
+                String position = positionField.getText().trim();
+                String gebDatumStr = geburtsdatumField.getText().trim();
+                String aktivStr = aktivField.getText().trim();
+                String verein = vereinField.getText().trim();
+                String fotoName = fotoField.getText().trim();
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.M.yyyy");
-            LocalDate geburtsdatum = LocalDate.parse(gebDatumStr, formatter);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.M.yyyy");
+                LocalDate geburtsdatum = LocalDate.parse(gebDatumStr, formatter);
 
-            ImageIcon fotoIcon = getScaledImageIcon("bilder/" + fotoName, 128, 160);
-            String aktivStatus = aktivStr.equalsIgnoreCase("aktiv") ? "Aktiv" : "Nicht aktiv";
+                ImageIcon fotoIcon = getScaledImageIcon("bilder/" + fotoName, 128, 160);
+                String aktivStatus = aktivStr.equalsIgnoreCase("aktiv") ? "Aktiv" : "Nicht aktiv";
 
-            // Neue ID generieren (einfach max ID + 1 aus Tabelle)
-            int maxId = 0;
-            for (int i = 0; i < tabelleModel.getRowCount(); i++) {
-                int id = (int) tabelleModel.getValueAt(i, 0);
-                if (id > maxId) maxId = id;
+                int maxId = 0;
+                for (int i = 0; i < tabelleModel.getRowCount(); i++) {
+                    int id = (int) tabelleModel.getValueAt(i, 0);
+                    if (id > maxId)
+                        maxId = id;
+                }
+                int neueId = maxId + 1;
+
+                Object[] neueZeile = {
+                        neueId, vorname, nachname, position, geburtsdatum, fotoIcon, aktivStatus, verein
+                };
+
+                tabelleModel.addRow(neueZeile);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Fehler bei der Eingabe: " + ex.getMessage(),
+                        "Fehler", JOptionPane.ERROR_MESSAGE);
             }
-            int neueId = maxId + 1;
-
-            Object[] neueZeile = {
-                    neueId, vorname, nachname, position, geburtsdatum, fotoIcon, aktivStatus, verein
-            };
-
-            tabelleModel.addRow(neueZeile);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Fehler bei der Eingabe: " + ex.getMessage(),
-                    "Fehler", JOptionPane.ERROR_MESSAGE);
         }
     }
-}
-
 }
