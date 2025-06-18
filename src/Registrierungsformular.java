@@ -432,6 +432,7 @@ public class Registrierungsformular extends JFrame {
 
                 JOptionPane.showMessageDialog(this, "Registrierung erfolgreich!", "Erfolg",
                         JOptionPane.INFORMATION_MESSAGE);
+                        new SpielerGUI();
 
                 // Formularfelder zurücksetzen
                 txt_vorname.setText("");

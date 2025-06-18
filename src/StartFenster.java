@@ -144,7 +144,7 @@ public class Startfenster extends JFrame {
 
         cardPanel.add(createCard("Spielerliste",
                 "Sieh dir alle registrierten Spieler und ihre Daten an.",
-                img3, () -> new SpielerGUI()));
+                img3, () -> new SpielerlisteOhneEinfuegen()));
 
         darkModeToggle.setText(darkMode ? "Light Mode" : "Dark Mode");
         repaint();
