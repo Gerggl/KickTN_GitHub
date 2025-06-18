@@ -29,6 +29,7 @@ public class Startfenster extends JFrame {
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        setVisible(true);
 
         try {
             img1 = ImageIO.read(new File("./bilder/bild1.jpg"));
@@ -39,14 +40,14 @@ public class Startfenster extends JFrame {
             System.out.println("Fehler beim Laden der Bilder: " + e.getMessage());
         }
 
-        initUI();
+        initComponents();
     }
 
-    private void initUI() {
+    // Formularfelder festlegen
+    private void initComponents() {
         mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // Header Panel mit Farbverlauf
         headerPanel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -94,12 +95,10 @@ public class Startfenster extends JFrame {
 
         mainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        // Karten-Panel (ohne Hover-Effekt auf Karte)
         cardPanel = new JPanel(new GridLayout(1, 3, 20, 20));
         cardPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
         mainPanel.add(cardPanel, BorderLayout.CENTER);
 
-        // Footer
         footerPanel = new JPanel(new GridBagLayout());
         footerLabel = new JLabel("© 2025 KickTN Projekt – Entwickelt mit Leidenschaft");
         footerLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -121,8 +120,7 @@ public class Startfenster extends JFrame {
 
         cardPanel.setBackground(background);
 
-        // Footer-Farbe anpassen:
-        if (darkMode) {
+        if (darkMode == true) {
             footerPanel.setBackground(darkButtonColor);
         } else {
             footerPanel.setBackground(new Color(245, 245, 245)); // helles Grau statt Blau
@@ -203,9 +201,6 @@ public class Startfenster extends JFrame {
     }
 
     private void applyDropShadow(JComponent comp) {
-        /*comp.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 4, 0, new Color(0, 0, 0, 30)),
-                comp.getBorder() != null ? comp.getBorder() : BorderFactory.createEmptyBorder(10, 10, 10, 10)));*/
     }
 
     private void toggleDarkMode() {
@@ -213,7 +208,6 @@ public class Startfenster extends JFrame {
         refreshTheme();
     }
 
-    // Abgerundeter normaler Button
     class RoundedButton extends JButton {
         private final Color normalColor;
         private final Color hoverColor;
@@ -253,7 +247,6 @@ public class Startfenster extends JFrame {
             g2.setColor(hovered ? hoverColor : normalColor);
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
 
-            // Text zentrieren
             FontMetrics fm = g2.getFontMetrics();
             Rectangle stringBounds = fm.getStringBounds(getText(), g2).getBounds();
 
@@ -269,11 +262,10 @@ public class Startfenster extends JFrame {
 
         @Override
         protected void paintBorder(Graphics g) {
-            // keine Border
+            // kein Rahmen
         }
     }
 
-    // Abgerundeter Toggle Button mit sauber zentriertem Text
     class RoundedToggleButton extends JToggleButton {
         private final Color normalColor;
         private final Color hoverColor;
@@ -314,7 +306,6 @@ public class Startfenster extends JFrame {
             g2.setColor(hovered ? hoverColor : normalColor);
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
 
-            // Text zentrieren
             FontMetrics fm = g2.getFontMetrics();
             Rectangle stringBounds = fm.getStringBounds(getText(), g2).getBounds();
 
@@ -330,10 +321,11 @@ public class Startfenster extends JFrame {
 
         @Override
         protected void paintBorder(Graphics g) {
-            // keine Border
+            // kein Rahmen
         }
     }
+
     public static void main(String[] args) {
-        new Startfenster().setVisible(true);
+        new Startfenster();
     }
 }

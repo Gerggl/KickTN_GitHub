@@ -1,14 +1,15 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 
 import javax.swing.*;
 import javax.swing.border.*;
 
 public class Registrierungsformular extends JFrame {
+    // Attribute
     JLabel lbl_ueberschrift, lbl_vorname, lbl_nachname, lbl_benutzer, lbl_passwort, lbl_passwortBestaetigen,
             lbl_email, lbl_geburtsdatum;
     JTextField txt_vorname, txt_nachname, txt_benutzer, txt_email, txt_geburtsdatum;
@@ -20,6 +21,7 @@ public class Registrierungsformular extends JFrame {
     JLabel lblNochNichtRegistriert;
     JButton btn_bereitsRegistriert;
 
+    // Farben für den Style
     private Color buttonColor;
     private Color hoverColor;
     private Color redColor;
@@ -28,21 +30,11 @@ public class Registrierungsformular extends JFrame {
     private Color textColor;
     private Color headerBgColor;
 
-    private boolean darkMode = false; // Start im Light Mode
+    private boolean darkMode = false;
 
+    // individueller Konstruktor
     public Registrierungsformular() {
         initColors();
-
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // fallback
-        }
 
         UIManager.put("control", bgColor);
         UIManager.put("info", bgColor);
@@ -61,11 +53,11 @@ public class Registrierungsformular extends JFrame {
         this.repaint();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-        this.setMinimumSize(new Dimension(520, 700)); // etwas größer als Login
+        this.setMinimumSize(new Dimension(540, 700)); // etwas größer als Login
     }
 
     private void initColors() {
-        if (darkMode) {
+        if (darkMode == true) {
             bgColor = new Color(40, 44, 52);
             headerBgColor = new Color(40, 44, 52);
             textColor = new Color(230, 230, 230);
@@ -84,6 +76,7 @@ public class Registrierungsformular extends JFrame {
         }
     }
 
+    // Style für die Textfelder
     private void styleTextField(JTextField field) {
         RoundedLineBorder rounded15Border = new RoundedLineBorder(buttonColor, 1, 15);
         RoundedLineBorder focus15Border = new RoundedLineBorder(hoverColor, 1, 15);
@@ -114,11 +107,12 @@ public class Registrierungsformular extends JFrame {
         });
     }
 
+    // Methode initComponents() legt die Formularfelder fest
     private void initComponents() {
         this.setLayout(new GridBagLayout());
+        // GridBagConstraints für den Abstand zwischen den Elementen
         GridBagConstraints gbc = new GridBagConstraints();
 
-        // Toggle Button oben rechts im Header
         toggleModeButton = new RoundedButton(darkMode ? "Light Mode" : "Dark Mode", buttonColor, hoverColor);
         toggleModeButton.setPreferredSize(new Dimension(120, 40));
         toggleModeButton.addActionListener(e -> toggleTheme());
@@ -263,7 +257,7 @@ public class Registrierungsformular extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(txt_geburtsdatum, gbc);
 
-        // AGB Checkbox + Label nebeneinander in FlowLayout Panel
+        // AGB Checkbox
         agbPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         agbPanel.setBackground(bgColor);
         chk_agb = new JCheckBox();
@@ -282,7 +276,7 @@ public class Registrierungsformular extends JFrame {
         gbc.fill = GridBagConstraints.NONE;
         this.add(agbPanel, gbc);
 
-        // Buttons (größer)
+        // Buttons
         btn_registrieren = new RoundedButton("Registrieren", buttonColor, hoverColor);
         btn_zuruecksetzen = new RoundedButton("Zurücksetzen", buttonColor, hoverColor);
         btn_beenden = new RoundedButton("Beenden", redColor, redHoverColor);
@@ -310,12 +304,12 @@ public class Registrierungsformular extends JFrame {
         this.add(btn_zuruecksetzen, gbc);
 
         gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.gridx = 0; // erste Spalte
+        gbc.gridx = 0;
         gbc.gridy = 12;
-        gbc.gridwidth = 2; // beide Spalten
+        gbc.gridwidth = 2;
         this.add(btn_beenden, gbc);
 
-        // Neuer Button "Bereits registriert"
+        // Button "Bereits registriert"
         btn_bereitsRegistriert = new JButton("Bereits registriert");
         btn_bereitsRegistriert.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btn_bereitsRegistriert.setForeground(buttonColor);
@@ -328,7 +322,6 @@ public class Registrierungsformular extends JFrame {
         lblNochNichtRegistriert.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         lblNochNichtRegistriert.setForeground(textColor);
 
-        // Panel mit FlowLayout für Text und Button nebeneinander
         JPanel registriertPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         registriertPanel.setBackground(bgColor);
         registriertPanel.add(lblNochNichtRegistriert);
@@ -343,10 +336,10 @@ public class Registrierungsformular extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         this.add(registriertPanel, gbc);
 
-        // NEU: Label "Noch nicht registriert?"
+        // Label "Noch nicht registriert?"
         lblNochNichtRegistriert = new JLabel("Noch nicht registriert?");
         lblNochNichtRegistriert.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblNochNichtRegistriert.setForeground(textColor); // nicht immer weiß, sondern Textfarbe (abhängig vom Mode)
+        lblNochNichtRegistriert.setForeground(textColor);
         lblNochNichtRegistriert.setOpaque(true);
         lblNochNichtRegistriert.setBackground(bgColor);
         gbc.gridx = 0;
@@ -369,26 +362,7 @@ public class Registrierungsformular extends JFrame {
         gbc.anchor = GridBagConstraints.LINE_START;
         this.add(lblNochNichtRegistriert, gbc);
 
-        btn_bereitsRegistriert = new JButton("Bereits registriert");
-        btn_bereitsRegistriert.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        btn_bereitsRegistriert.setOpaque(true);
-        btn_bereitsRegistriert.setBorderPainted(false);
-        btn_bereitsRegistriert.setBackground(bgColor);
-        btn_bereitsRegistriert.setForeground(buttonColor);
-        btn_bereitsRegistriert.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn_bereitsRegistriert.setFocusPainted(false);
-        btn_bereitsRegistriert.addActionListener(e -> {
-            this.dispose();
-            // Login öffnen ...
-        });
-        gbc.gridx = 1;
-        gbc.gridy = 11;
-        gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.LINE_END;
-        gbc.insets = new Insets(0, 5, 10, 10);
-        this.add(btn_bereitsRegistriert, gbc);
-
-        // ActionListener für den "Bereits registriert" Button
+        // ActionListener für den "Bereits registriert"-Button
         btn_bereitsRegistriert.addActionListener(e -> {
             new Login();
         });
@@ -410,8 +384,8 @@ public class Registrierungsformular extends JFrame {
 
         // ActionListener für Registrieren Button
         btn_registrieren.addActionListener(e -> {
-            if (!chk_agb.isSelected()) {
-                JOptionPane.showMessageDialog(this, "Bitte akzeptiere die AGB", "Fehler", JOptionPane.ERROR_MESSAGE);
+            if (chk_agb.isSelected() == false) {
+                JOptionPane.showMessageDialog(this, "Bitte akzeptiere die AGB!", "Fehler", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -424,45 +398,66 @@ public class Registrierungsformular extends JFrame {
             String geburtsdatum = txt_geburtsdatum.getText();
 
             if (!passwort.equals(passwortBestaetigen)) {
-                JOptionPane.showMessageDialog(this, "Passwörter stimmen nicht überein", "Fehler",
+                JOptionPane.showMessageDialog(this, "Die Passwörter stimmen nicht überein!", "Fehler",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // Optional: einfache Validierung
+            // Prüfung, ob die Felder leer sind oder nicht -> wenn ja, dann Fehlermeldung
+            // ausgeben
             if (vorname.isEmpty() || nachname.isEmpty() || benutzer.isEmpty() || email.isEmpty()
                     || geburtsdatum.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Bitte fülle alle Felder aus", "Fehler", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Bitte leere Felder ausfüllen!", "Fehler",
+                        JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             // Daten in die Datenbank speichern
-            try (Connection conn = Datenbank.getConnection()) {
-                String sql = "INSERT INTO benutzerkicktn (vorname, nachname, benutzername, passwort, email, geburtsdatum) VALUES (?, ?, ?, ?, ?, ?)";
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                stmt.setString(1, vorname);
-                stmt.setString(2, nachname);
-                stmt.setString(3, benutzer);
-                stmt.setString(4, passwort); // Hinweis: Passwort sollte gehasht werden!
-                stmt.setString(5, email);
-                stmt.setDate(6, Date.valueOf(geburtsdatum)); // Format prüfen
+            try {
+                LocalDate geburtsdatumParsed = LocalDate.parse(txt_geburtsdatum.getText());
 
-                stmt.executeUpdate();
+                char[] passwortArray = txt_passwort.getPassword();
+                passwort = new String(passwortArray);
+
+                BenutzerDAO.registriereBenutzer(
+                        txt_vorname.getText(),
+                        txt_nachname.getText(),
+                        txt_benutzer.getText(),
+                        passwort,
+                        txt_email.getText(),
+                        geburtsdatumParsed);
+
+                Arrays.fill(passwortArray, ' ');
 
                 JOptionPane.showMessageDialog(this, "Registrierung erfolgreich!", "Erfolg",
                         JOptionPane.INFORMATION_MESSAGE);
+
+                // Formularfelder zurücksetzen
+                txt_vorname.setText("");
+                txt_nachname.setText("");
+                txt_benutzer.setText("");
+                txt_email.setText("");
+                txt_geburtsdatum.setText("");
+                txt_passwort.setText("");
+                txt_passwortBestaetigen.setText("");
+                chk_agb.setSelected(false);
+
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Fehler bei der Registrierung: " + ex.getMessage(),
                         "Datenbankfehler", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
-            } catch (IllegalArgumentException ex) {
+            } catch (DateTimeParseException ex) {
                 JOptionPane.showMessageDialog(this, "Geburtsdatum ist ungültig (Format: JJJJ-MM-TT)", "Fehler",
                         JOptionPane.ERROR_MESSAGE);
             }
+
         });
+        JRootPane rootPane = this.getRootPane();
+        rootPane.setDefaultButton(btn_registrieren);
 
     }
 
+    // Dark-Mode
     private void toggleTheme() {
         darkMode = !darkMode;
         initColors();
@@ -479,7 +474,6 @@ public class Registrierungsformular extends JFrame {
         lbl_email.setForeground(textColor);
         lbl_geburtsdatum.setForeground(textColor);
 
-        // Textfelder
         JTextField[] fields = { txt_vorname, txt_nachname, txt_benutzer, txt_email, txt_geburtsdatum };
         for (JTextField f : fields) {
             f.setBackground(bgColor);
@@ -513,9 +507,6 @@ public class Registrierungsformular extends JFrame {
         toggleModeButton.setBackground(buttonColor);
         toggleModeButton.setForeground(Color.WHITE);
 
-        // Header Panel Background aktualisieren
-        // Da headerPanel lokal in initComponents ist, setzen wir Hintergrund vom ersten
-        // Kind
         if (getContentPane().getComponentCount() > 0) {
             Component comp = getContentPane().getComponent(0);
             if (comp instanceof JPanel) {
@@ -523,7 +514,6 @@ public class Registrierungsformular extends JFrame {
             }
         }
 
-        // Aktualisiere die Rahmen der Textfelder
         for (JTextField f : fields) {
             styleTextField(f);
         }
@@ -545,15 +535,16 @@ public class Registrierungsformular extends JFrame {
             if (comp instanceof JPanel panel) {
                 panel.setBackground(bgColor);
                 for (Component c : panel.getComponents()) {
-                    if (c instanceof JLabel lbl) lbl.setForeground(textColor);
-                    if (c instanceof JButton btn && btn != toggleModeButton) btn.setForeground(buttonColor);
+                    if (c instanceof JLabel lbl)
+                        lbl.setForeground(textColor);
+                    if (c instanceof JButton btn && btn != toggleModeButton)
+                        btn.setForeground(buttonColor);
                 }
             }
         }
 
     }
 
-    // Custom Button Klasse mit abgerundeten Ecken
     private static class RoundedButton extends JButton {
         private Color normalColor;
         private Color hoverColor;
@@ -604,7 +595,6 @@ public class Registrierungsformular extends JFrame {
         }
     }
 
-    // Border mit abgerundeten Ecken
     private static class RoundedLineBorder extends AbstractBorder {
         private Color color;
         private int thickness = 1;

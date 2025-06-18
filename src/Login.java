@@ -2,9 +2,9 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.SwingWorker;
 
 public class Login extends JFrame {
+    // Attribute
     JLabel lbl_ueberschrift, lbl_benutzer, lbl_passwort;
     JTextField txt_benutzer;
     JPasswordField txt_passwort;
@@ -20,19 +20,9 @@ public class Login extends JFrame {
 
     private boolean darkMode = false;
 
+    // individueller Konstruktor
     public Login() {
         initColors();
-
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // fallback
-        }
 
         UIManager.put("control", bgColor);
         UIManager.put("info", bgColor);
@@ -53,7 +43,7 @@ public class Login extends JFrame {
     }
 
     private void initColors() {
-        if (darkMode) {
+        if (darkMode == true) {
             bgColor = new Color(40, 44, 52);
             textColor = new Color(230, 230, 230);
             buttonColor = new Color(45, 156, 219);
@@ -70,6 +60,7 @@ public class Login extends JFrame {
         }
     }
 
+    // Style
     private void styleTextField(JTextField field) {
         RoundedLineBorder rounded15Border = new RoundedLineBorder(buttonColor, 1, 15);
         RoundedLineBorder focus15Border = new RoundedLineBorder(hoverColor, 1, 15);
@@ -100,6 +91,7 @@ public class Login extends JFrame {
         });
     }
 
+    // initComponents() -> Formularelemente festlegen
     private void initComponents() {
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -123,6 +115,7 @@ public class Login extends JFrame {
         Font labelFont = new Font("Segoe UI", Font.PLAIN, 16);
         Font titleFont = new Font("Segoe UI", Font.BOLD, 32);
 
+        // Überschrift
         lbl_ueberschrift = new JLabel("Willkommen bei KickTN");
         lbl_ueberschrift.setFont(titleFont);
         lbl_ueberschrift.setForeground(buttonColor);
@@ -133,6 +126,7 @@ public class Login extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         this.add(lbl_ueberschrift, gbc);
 
+        // Benutzer
         lbl_benutzer = new JLabel("Benutzername:");
         lbl_benutzer.setFont(labelFont);
         lbl_benutzer.setForeground(textColor);
@@ -149,6 +143,7 @@ public class Login extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(txt_benutzer, gbc);
 
+        // Passwort
         lbl_passwort = new JLabel("Passwort:");
         lbl_passwort.setFont(labelFont);
         lbl_passwort.setForeground(textColor);
@@ -164,9 +159,15 @@ public class Login extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(txt_passwort, gbc);
 
+        // Buttons
         btn_login = new RoundedButton("Login", buttonColor, hoverColor);
         btn_zuruecksetzen = new RoundedButton("Zurücksetzen", buttonColor, hoverColor);
         btn_beenden = new RoundedButton("Beenden", redColor, redHoverColor);
+
+        btn_login.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn_zuruecksetzen.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn_beenden.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        toggleModeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -221,6 +222,7 @@ public class Login extends JFrame {
         this.getRootPane().setDefaultButton(btn_login);
     }
 
+    // toggleTheme() für Dark Mode
     private void toggleTheme() {
         darkMode = !darkMode;
         initColors();
@@ -241,8 +243,10 @@ public class Login extends JFrame {
             if (comp instanceof JPanel panel) {
                 panel.setBackground(bgColor);
                 for (Component c : panel.getComponents()) {
-                    if (c instanceof JLabel lbl) lbl.setForeground(textColor);
-                    if (c instanceof JButton btn && btn != toggleModeButton) btn.setForeground(buttonColor);
+                    if (c instanceof JLabel lbl)
+                        lbl.setForeground(textColor);
+                    if (c instanceof JButton btn && btn != toggleModeButton)
+                        btn.setForeground(buttonColor);
                 }
             }
         }
@@ -261,11 +265,9 @@ public class Login extends JFrame {
                 String passwort = new String(passwortChars);
                 java.util.Arrays.fill(passwortChars, '0');
 
-                // Optional Hashing (aktivieren wenn in DB gehasht gespeichert)
-                // passwort = hashPassword(passwort);
-
                 if (benutzer.isEmpty() || passwort.isEmpty()) {
-                    JOptionPane.showMessageDialog(Login.this, "Bitte Benutzername und Passwort eingeben.", "Fehler", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(Login.this, "Bitte Benutzername und Passwort eingeben!", "Fehler",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -283,8 +285,10 @@ public class Login extends JFrame {
                             boolean loginErfolgreich = get();
                             if (loginErfolgreich) {
                                 JOptionPane.showMessageDialog(Login.this, "Login erfolgreich!");
+                                new SpielerGUI();
                             } else {
-                                JOptionPane.showMessageDialog(Login.this, "Benutzername oder Passwort falsch.");
+                                JOptionPane.showMessageDialog(Login.this,
+                                        "Benutzername oder Passwort falsch! Prüfen Sie die Eingaben!");
                             }
                         } catch (Exception ex) {
                             ex.printStackTrace();
@@ -350,7 +354,8 @@ public class Login extends JFrame {
         }
 
         @Override
-        protected void paintBorder(Graphics g) {}
+        protected void paintBorder(Graphics g) {
+        }
     }
 
     static class RoundedLineBorder extends AbstractBorder {
