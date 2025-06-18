@@ -369,7 +369,7 @@ public class Registrierungsformular extends JFrame {
         });
 
         // ActionListener für Beenden Button
-        btn_beenden.addActionListener(e -> System.exit(0));
+        btn_beenden.addActionListener(e -> dispose());
 
         // ActionListener für Zurücksetzen Button
         btn_zuruecksetzen.addActionListener(e -> {

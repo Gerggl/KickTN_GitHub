@@ -301,7 +301,7 @@ public class Login extends JFrame {
                 txt_benutzer.setText("");
                 txt_passwort.setText("");
             } else if (e.getSource() == btn_beenden) {
-                System.exit(0);
+                dispose();
             }
         }
     }
