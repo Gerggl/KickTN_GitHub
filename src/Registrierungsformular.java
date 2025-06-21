@@ -53,7 +53,7 @@ public class Registrierungsformular extends JFrame {
         this.repaint();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-        this.setMinimumSize(new Dimension(540, 700)); // etwas größer als Login
+        this.setMinimumSize(new Dimension(540, 700));
     }
 
     private void initColors() {
@@ -107,10 +107,9 @@ public class Registrierungsformular extends JFrame {
         });
     }
 
-    // Methode initComponents() legt die Formularfelder fest
+    // Methode initComponents() -> Formularfelder
     private void initComponents() {
         this.setLayout(new GridBagLayout());
-        // GridBagConstraints für den Abstand zwischen den Elementen
         GridBagConstraints gbc = new GridBagConstraints();
 
         toggleModeButton = new RoundedButton(darkMode ? "Light Mode" : "Dark Mode", buttonColor, hoverColor);

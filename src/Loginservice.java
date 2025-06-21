@@ -12,7 +12,7 @@ public class Loginservice {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, benutzer);
-            stmt.setString(2, passwort);  // Achtung: Passwörter lieber gehashed speichern!
+            stmt.setString(2, passwort);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {

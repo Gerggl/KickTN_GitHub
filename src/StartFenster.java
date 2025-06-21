@@ -25,7 +25,7 @@ public class Startfenster extends JFrame {
     private RoundedToggleButton darkModeToggle;
 
     public Startfenster() {
-        setTitle("Startfenster für das Spielprojekt");
+        setTitle("Startfenster");
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -123,7 +123,7 @@ public class Startfenster extends JFrame {
         if (darkMode == true) {
             footerPanel.setBackground(darkButtonColor);
         } else {
-            footerPanel.setBackground(new Color(245, 245, 245)); // helles Grau statt Blau
+            footerPanel.setBackground(new Color(245, 245, 245));
         }
         footerLabel.setForeground(darkMode ? Color.WHITE : Color.DARK_GRAY);
 
