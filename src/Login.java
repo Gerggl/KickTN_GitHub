@@ -265,9 +265,8 @@ public class Login extends JFrame {
                         try {
                             boolean loginErfolgreich = get();
                             if (loginErfolgreich) {
-                                JOptionPane.showMessageDialog(Login.this, "Login erfolgreich! Sie werden nun zur Spielerliste weitergeleitet.");
-                                dispose();
                                 new SpielerGUI();
+                                dispose();
                             } else {
                                 JOptionPane.showMessageDialog(Login.this,
                                         "Benutzername oder Passwort falsch! Prüfen Sie die Eingaben!");
@@ -287,7 +286,6 @@ public class Login extends JFrame {
             } else if (e.getSource() == btn_abmelden) {
                 txt_benutzer.setText("");
                 txt_passwort.setText("");
-                JOptionPane.showMessageDialog(Login.this, "Abmeldung durchgeführt.");
                 dispose();
             }
         }
