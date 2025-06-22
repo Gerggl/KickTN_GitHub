@@ -8,7 +8,7 @@ public class BenutzerDAO {
 
     public static void registriereBenutzer(String vorname, String nachname, String benutzername,
                                            String passwort, String email, LocalDate geburtsdatum) throws SQLException {
-        String sql = "INSERT INTO benutzerkicktn (vorname, nachname, benutzername, passwort, email, geburtsdatum) " +
+        String sql = "INSERT INTO benutzer_ktn (vorname, nachname, benutzername, passwort, email, geburtsdatum) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnector.getConnection();

@@ -384,11 +384,6 @@ public class Registrierungsformular extends JFrame {
 
         // ActionListener für Registrieren Button
         btn_registrieren.addActionListener(e -> {
-            if (chk_agb.isSelected() == false) {
-                JOptionPane.showMessageDialog(this, "Bitte akzeptiere die AGB!", "Fehler", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
             String vorname = txt_vorname.getText();
             String nachname = txt_nachname.getText();
             String benutzer = txt_benutzer.getText();
@@ -396,18 +391,22 @@ public class Registrierungsformular extends JFrame {
             String passwortBestaetigen = new String(txt_passwortBestaetigen.getPassword());
             String email = txt_email.getText();
             String geburtsdatum = txt_geburtsdatum.getText();
-
-            if (!passwort.equals(passwortBestaetigen)) {
-                JOptionPane.showMessageDialog(this, "Die Passwörter stimmen nicht überein!", "Fehler",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
             // Prüfung, ob die Felder leer sind oder nicht -> wenn ja, dann Fehlermeldung
             // ausgeben
             if (vorname.isEmpty() || nachname.isEmpty() || benutzer.isEmpty() || email.isEmpty()
                     || geburtsdatum.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Bitte leere Felder ausfüllen!", "Fehler",
+                JOptionPane.showMessageDialog(this, "Bitte alle Felder ausfüllen!", "Fehler",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (chk_agb.isSelected() == false) {
+                JOptionPane.showMessageDialog(this, "Bitte akzeptiere die AGB!", "Fehler", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!passwort.equals(passwortBestaetigen)) {
+                JOptionPane.showMessageDialog(this, "Die Passwörter stimmen nicht überein!", "Fehler",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -429,9 +428,10 @@ public class Registrierungsformular extends JFrame {
 
                 Arrays.fill(passwortArray, ' ');
 
-                JOptionPane.showMessageDialog(this, "Registrierung erfolgreich!", "Erfolg",
+                JOptionPane.showMessageDialog(this, "Registrierung erfolgreich! Sie werden nun zur Spielerliste weitergeleitet.", "Erfolg",
                         JOptionPane.INFORMATION_MESSAGE);
                         new SpielerGUI();
+                        dispose();
 
                 // Formularfelder zurücksetzen
                 txt_vorname.setText("");

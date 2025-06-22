@@ -265,7 +265,8 @@ public class Login extends JFrame {
                         try {
                             boolean loginErfolgreich = get();
                             if (loginErfolgreich) {
-                                JOptionPane.showMessageDialog(Login.this, "Login erfolgreich!");
+                                JOptionPane.showMessageDialog(Login.this, "Login erfolgreich! Sie werden nun zur Spielerliste weitergeleitet.");
+                                dispose();
                                 new SpielerGUI();
                             } else {
                                 JOptionPane.showMessageDialog(Login.this,

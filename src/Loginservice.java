@@ -6,7 +6,7 @@ import java.sql.SQLException;
 public class Loginservice {
 
     public static boolean pruefeLogin(String benutzer, String passwort) {
-        String sql = "SELECT COUNT(*) FROM benutzerkicktn WHERE Benutzername = ? AND Passwort = ?";
+        String sql = "SELECT COUNT(*) FROM benutzer_ktn WHERE Benutzername = ? AND Passwort = ?";
 
         try (Connection conn = DatabaseConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
