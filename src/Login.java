@@ -8,7 +8,7 @@ public class Login extends JFrame {
     JLabel lbl_ueberschrift, lbl_benutzer, lbl_passwort;
     JTextField txt_benutzer;
     JPasswordField txt_passwort;
-    RoundedButton btn_login, btn_zuruecksetzen, btn_beenden;
+    RoundedButton btn_login, btn_zuruecksetzen, btn_beenden, btn_abmelden;
     RoundedButton toggleModeButton;
 
     private Color buttonColor;
@@ -20,7 +20,7 @@ public class Login extends JFrame {
 
     private boolean darkMode = false;
 
-    // individueller Konstruktor
+    // Konstruktor
     public Login() {
         initColors();
 
@@ -39,11 +39,11 @@ public class Login extends JFrame {
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-        this.setMinimumSize(new Dimension(450, 620));
+        this.setMinimumSize(new Dimension(450, 640));
     }
 
     private void initColors() {
-        if (darkMode == true) {
+        if (darkMode) {
             bgColor = new Color(40, 44, 52);
             textColor = new Color(230, 230, 230);
             buttonColor = new Color(45, 156, 219);
@@ -60,15 +60,12 @@ public class Login extends JFrame {
         }
     }
 
-    // Style
     private void styleTextField(JTextField field) {
         RoundedLineBorder rounded15Border = new RoundedLineBorder(buttonColor, 1, 15);
         RoundedLineBorder focus15Border = new RoundedLineBorder(hoverColor, 1, 15);
         Border padding = BorderFactory.createEmptyBorder(8, 12, 8, 12);
 
-        field.setBorder(BorderFactory.createCompoundBorder(
-                rounded15Border,
-                padding));
+        field.setBorder(BorderFactory.createCompoundBorder(rounded15Border, padding));
         field.setBackground(bgColor);
         field.setForeground(textColor);
         field.setFont(new Font("Segoe UI", Font.PLAIN, 16));
@@ -77,21 +74,16 @@ public class Login extends JFrame {
         field.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                field.setBorder(BorderFactory.createCompoundBorder(
-                        focus15Border,
-                        padding));
+                field.setBorder(BorderFactory.createCompoundBorder(focus15Border, padding));
             }
 
             @Override
             public void focusLost(FocusEvent e) {
-                field.setBorder(BorderFactory.createCompoundBorder(
-                        rounded15Border,
-                        padding));
+                field.setBorder(BorderFactory.createCompoundBorder(rounded15Border, padding));
             }
         });
     }
 
-    // initComponents() -> Formularelemente festlegen
     private void initComponents() {
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -115,35 +107,28 @@ public class Login extends JFrame {
         Font labelFont = new Font("Segoe UI", Font.PLAIN, 16);
         Font titleFont = new Font("Segoe UI", Font.BOLD, 32);
 
-        // Überschrift
         lbl_ueberschrift = new JLabel("Willkommen bei KickTN");
         lbl_ueberschrift.setFont(titleFont);
         lbl_ueberschrift.setForeground(buttonColor);
-        gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 2;
         gbc.insets = new Insets(15, 10, 30, 10);
         gbc.anchor = GridBagConstraints.CENTER;
         this.add(lbl_ueberschrift, gbc);
 
-        // Benutzer
         lbl_benutzer = new JLabel("Benutzername:");
         lbl_benutzer.setFont(labelFont);
         lbl_benutzer.setForeground(textColor);
-        gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridwidth = 1;
         this.add(lbl_benutzer, gbc);
 
         txt_benutzer = new JTextField(16);
         styleTextField(txt_benutzer);
         gbc.gridx = 1;
-        gbc.gridy = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(txt_benutzer, gbc);
 
-        // Passwort
         lbl_passwort = new JLabel("Passwort:");
         lbl_passwort.setFont(labelFont);
         lbl_passwort.setForeground(textColor);
@@ -155,30 +140,33 @@ public class Login extends JFrame {
         txt_passwort = new JPasswordField(16);
         styleTextField(txt_passwort);
         gbc.gridx = 1;
-        gbc.gridy = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         this.add(txt_passwort, gbc);
 
-        // Buttons
         btn_login = new RoundedButton("Login", buttonColor, hoverColor);
         btn_zuruecksetzen = new RoundedButton("Zurücksetzen", buttonColor, hoverColor);
         btn_beenden = new RoundedButton("Beenden", redColor, redHoverColor);
+        btn_abmelden = new RoundedButton("Abmelden", redColor, redHoverColor);
 
         btn_login.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn_zuruecksetzen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn_beenden.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn_abmelden.setCursor(new Cursor(Cursor.HAND_CURSOR));
         toggleModeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btn_login.addActionListener(new MyActionListener());
+        btn_zuruecksetzen.addActionListener(new MyActionListener());
+        btn_beenden.addActionListener(new MyActionListener());
+        btn_abmelden.addActionListener(new MyActionListener());
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        gbc.gridwidth = 1;
         gbc.weightx = 0.5;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 10, 5, 10);
         this.add(btn_login, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 4;
         this.add(btn_zuruecksetzen, gbc);
 
         gbc.gridx = 0;
@@ -186,9 +174,8 @@ public class Login extends JFrame {
         gbc.gridwidth = 2;
         this.add(btn_beenden, gbc);
 
-        btn_login.addActionListener(new MyActionListener());
-        btn_zuruecksetzen.addActionListener(new MyActionListener());
-        btn_beenden.addActionListener(new MyActionListener());
+        gbc.gridy = 6;
+        this.add(btn_abmelden, gbc);
 
         JPanel registrierenPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
         registrierenPanel.setBackground(bgColor);
@@ -204,7 +191,6 @@ public class Login extends JFrame {
         btnRegistrieren.setContentAreaFilled(false);
         btnRegistrieren.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnRegistrieren.setFocusPainted(false);
-
         btnRegistrieren.addActionListener(e -> {
             dispose();
             new Registrierungsformular();
@@ -213,16 +199,12 @@ public class Login extends JFrame {
         registrierenPanel.add(lblNochNichtRegistriert);
         registrierenPanel.add(btnRegistrieren);
 
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(20, 10, 20, 10);
+        gbc.gridy = 7;
         this.add(registrierenPanel, gbc);
 
         this.getRootPane().setDefaultButton(btn_login);
     }
 
-    // toggleTheme() für Dark Mode
     private void toggleTheme() {
         darkMode = !darkMode;
         initColors();
@@ -235,7 +217,7 @@ public class Login extends JFrame {
         btn_login.updateColors(buttonColor, hoverColor);
         btn_zuruecksetzen.updateColors(buttonColor, hoverColor);
         btn_beenden.updateColors(redColor, redHoverColor);
-
+        btn_abmelden.updateColors(buttonColor, hoverColor);
         toggleModeButton.setText(darkMode ? "Light Mode" : "Dark Mode");
         toggleModeButton.updateColors(buttonColor, hoverColor);
 
@@ -243,8 +225,7 @@ public class Login extends JFrame {
             if (comp instanceof JPanel panel) {
                 panel.setBackground(bgColor);
                 for (Component c : panel.getComponents()) {
-                    if (c instanceof JLabel lbl)
-                        lbl.setForeground(textColor);
+                    if (c instanceof JLabel lbl) lbl.setForeground(textColor);
                     if (c instanceof JButton btn && btn != toggleModeButton)
                         btn.setForeground(buttonColor);
                 }
@@ -301,6 +282,11 @@ public class Login extends JFrame {
                 txt_benutzer.setText("");
                 txt_passwort.setText("");
             } else if (e.getSource() == btn_beenden) {
+                dispose();
+            } else if (e.getSource() == btn_abmelden) {
+                txt_benutzer.setText("");
+                txt_passwort.setText("");
+                JOptionPane.showMessageDialog(Login.this, "Abmeldung durchgeführt.");
                 dispose();
             }
         }

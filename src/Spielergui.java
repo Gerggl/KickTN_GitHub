@@ -472,29 +472,43 @@ public class SpielerGUI extends JFrame {
     }
 
     private void spielerHinzufuegen() {
-        JTextField vornameField = new JTextField();
-        JTextField nachnameField = new JTextField();
-        JTextField positionField = new JTextField();
-        JTextField geburtsdatumField = new JTextField("TT.MM.JJJJ");
-        JTextField aktivField = new JTextField("Aktiv/Nicht aktiv");
-        JTextField vereinField = new JTextField();
-        JTextField fotoField = new JTextField("Dateiname.jpg");
+        JTextField vornameField = createRoundedTextField();
+        JTextField nachnameField = createRoundedTextField();
+        JComboBox<String> positionCombo = new JComboBox<>(new String[] {
+                "Torwart", "Verteidiger", "Mittelfeld", "Stürmer", "Ersatz", "Andere"
+        });
+        JTextField geburtsdatumField = createRoundedTextField("TT.MM.JJJJ");
+        JComboBox<String> aktivCombo = new JComboBox<>(new String[] { "Aktiv", "Nicht aktiv" });
+        JTextField vereinField = createRoundedTextField();
+        JButton fotoButton = new JButton("Foto auswählen");
+        JLabel fotoLabel = new JLabel("Kein Bild gewählt");
+        final String[] fotoDateiname = { "" };
 
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(new JLabel("Vorname:"));
-        panel.add(vornameField);
-        panel.add(new JLabel("Nachname:"));
-        panel.add(nachnameField);
-        panel.add(new JLabel("Position:"));
-        panel.add(positionField);
-        panel.add(new JLabel("Geburtsdatum (TT.MM.JJJJ):"));
-        panel.add(geburtsdatumField);
-        panel.add(new JLabel("Aktiv (Aktiv/Nicht aktiv):"));
-        panel.add(aktivField);
-        panel.add(new JLabel("Verein:"));
-        panel.add(vereinField);
-        panel.add(new JLabel("Foto-Dateiname (z.B. bild.jpg):"));
-        panel.add(fotoField);
+        fotoButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser("bilder/");
+            int result = fileChooser.showOpenDialog(null);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                fotoDateiname[0] = selectedFile.getName();
+                fotoLabel.setText(selectedFile.getName());
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(new Color(245, 245, 250));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        Font labelFont = new Font("SansSerif", Font.BOLD, 12);
+        Color accent = new Color(80, 120, 200);
+
+        addLabeledField(panel, "Vorname:", vornameField, labelFont, accent);
+        addLabeledField(panel, "Nachname:", nachnameField, labelFont, accent);
+        addLabeledField(panel, "Position:", positionCombo, labelFont, accent);
+        addLabeledField(panel, "Geburtsdatum (TT.MM.JJJJ):", geburtsdatumField, labelFont, accent);
+        addLabeledField(panel, "Aktiv:", aktivCombo, labelFont, accent);
+        addLabeledField(panel, "Verein:", vereinField, labelFont, accent);
+        addLabeledField(panel, "Foto-Datei:", fotoButton, fotoLabel, labelFont, accent);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Neuen Spieler hinzufügen",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -503,35 +517,131 @@ public class SpielerGUI extends JFrame {
             try {
                 String vorname = vornameField.getText().trim();
                 String nachname = nachnameField.getText().trim();
-                String position = positionField.getText().trim();
+                String position = (String) positionCombo.getSelectedItem();
                 String gebDatumStr = geburtsdatumField.getText().trim();
-                String aktivStr = aktivField.getText().trim();
+                String aktivStatus = (String) aktivCombo.getSelectedItem();
                 String verein = vereinField.getText().trim();
-                String fotoName = fotoField.getText().trim();
+                String fotoName = fotoDateiname[0].isEmpty() ? "standard.jpg" : fotoDateiname[0];
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d.M.yyyy");
                 LocalDate geburtsdatum = LocalDate.parse(gebDatumStr, formatter);
 
                 ImageIcon fotoIcon = getScaledImageIcon("bilder/" + fotoName, 128, 160);
-                String aktivStatus = aktivStr.equalsIgnoreCase("aktiv") ? "Aktiv" : "Nicht aktiv";
 
-                int maxId = 0;
-                for (int i = 0; i < tabelleModel.getRowCount(); i++) {
-                    int id = (int) tabelleModel.getValueAt(i, 0);
-                    if (id > maxId)
-                        maxId = id;
+                // In Datenbank speichern
+                String url = "jdbc:mysql://localhost:3307/kicktn_db";
+                String user = "root";
+                String pass = "";
+
+                int vereinId = getVereinIdByName(verein);
+
+                String insertSQL = "INSERT INTO spieler_ktn " +
+                        "(Vorname, Nachname, Position, Geburtsdatum, Foto, Aktiv, VereinID) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+                try (Connection conn = DriverManager.getConnection(url, user, pass);
+                        PreparedStatement pstmt = conn.prepareStatement(insertSQL, Statement.RETURN_GENERATED_KEYS)) {
+
+                    pstmt.setString(1, vorname);
+                    pstmt.setString(2, nachname);
+                    pstmt.setString(3, position);
+                    pstmt.setDate(4, java.sql.Date.valueOf(geburtsdatum));
+                    pstmt.setString(5, fotoName);
+                    pstmt.setBoolean(6, aktivStatus.equalsIgnoreCase("Aktiv"));
+                    pstmt.setInt(7, vereinId);
+
+                    pstmt.executeUpdate();
+
+                    // Neue Spieler-ID aus der DB holen
+                    int neueId = -1;
+                    try (ResultSet keys = pstmt.getGeneratedKeys()) {
+                        if (keys.next()) {
+                            neueId = keys.getInt(1);
+                        }
+                    }
+
+                    // Spieler auch im GUI anzeigen
+                    Object[] neueZeile = {
+                            neueId, vorname, nachname, position, geburtsdatum, fotoIcon, aktivStatus, verein
+                    };
+                    tabelleModel.addRow(neueZeile);
+
                 }
-                int neueId = maxId + 1;
 
-                Object[] neueZeile = {
-                        neueId, vorname, nachname, position, geburtsdatum, fotoIcon, aktivStatus, verein
-                };
-
-                tabelleModel.addRow(neueZeile);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Fehler bei der Eingabe: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Fehler bei der Eingabe oder beim Speichern: " + ex.getMessage(),
                         "Fehler", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
+
+    private JTextField createRoundedTextField() {
+        return createRoundedTextField("");
+    }
+
+    private JTextField createRoundedTextField(String placeholder) {
+        JTextField field = new JTextField(15);
+        field.setText(placeholder);
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+        field.setBackground(new Color(255, 255, 255));
+        field.setOpaque(true);
+        field.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        return field;
+    }
+
+    private void addLabeledField(JPanel panel, String labelText, JComponent field, Font font, Color color) {
+        JLabel label = new JLabel(labelText);
+        label.setFont(font);
+        label.setForeground(color);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        field.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(label);
+        panel.add(field);
+        panel.add(Box.createVerticalStrut(8));
+    }
+
+    private void addLabeledField(JPanel panel, String labelText, JButton button, JLabel label, Font font, Color color) {
+        JLabel titleLabel = new JLabel(labelText);
+        titleLabel.setFont(font);
+        titleLabel.setForeground(color);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel filePanel = new JPanel();
+        filePanel.setLayout(new BoxLayout(filePanel, BoxLayout.X_AXIS));
+        filePanel.setBackground(panel.getBackground());
+        filePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        filePanel.add(button);
+        filePanel.add(Box.createHorizontalStrut(10));
+        filePanel.add(label);
+
+        panel.add(titleLabel);
+        panel.add(filePanel);
+        panel.add(Box.createVerticalStrut(8));
+    }
+
+    private int getVereinIdByName(String vereinsname) throws SQLException {
+        String url = "jdbc:mysql://localhost:3307/kicktn_db";
+        String user = "root";
+        String pass = "";
+
+        String sql = "SELECT VereinID FROM verein_ktn WHERE Vereinsname = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, vereinsname);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("VereinID");
+                } else {
+                    throw new SQLException("Verein '" + vereinsname + "' nicht gefunden.");
+                }
+            }
+        }
+    }
+
 }
